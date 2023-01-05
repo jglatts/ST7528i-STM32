@@ -10,7 +10,7 @@ uint16_t scr_height = SCR_H;
 I2C_HandleTypeDef* i2c_handle;
 
 // Display image orientation
-static uint8_t scr_orientation = SCR_ORIENT_NORMAL;
+static uint8_t scr_orientation = SCR_ORIENT_CCW;
 
 // Video RAM buffer (128x128x4bit = 8192 bytes)
 static uint8_t vRAM[(160 * 129) >> 1] __attribute__((aligned(4)));
