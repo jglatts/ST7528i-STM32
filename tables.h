@@ -9,7 +9,7 @@
 #define INC_TABLES_H_
 
 // Look-up table of pixel grayscale level
-static const uint32_t GS_LUT[] = {
+ const uint32_t GS_LUT[] = {
 		0x00000000, // 0 (white)
 		0x01000000, // 1
 		0x00010000, // 2
@@ -29,7 +29,7 @@ static const uint32_t GS_LUT[] = {
 };
 
 // Look-up table of masks to clear pixel
-static const uint32_t POC_LUT[] = {
+ const uint32_t POC_LUT[] = {
 		0xFEFEFEFE, // 0
 		0xFDFDFDFD, // 1
 		0xFBFBFBFB, // 2
@@ -41,7 +41,7 @@ static const uint32_t POC_LUT[] = {
 };
 
 // Look-up table of mask for partial page filing
-static const uint32_t LUT_PPM[] = {
+ const uint32_t LUT_PPM[] = {
 		0x00000000, // 0
 		0x80808080, // 1
 		0xC0C0C0C0, // 2
@@ -53,7 +53,7 @@ static const uint32_t LUT_PPM[] = {
 };
 
 // Look-up table of full page by grayscale level
-static const uint32_t LUT_SBC[] = {
+ const uint32_t LUT_SBC[] = {
 		0x00000000, // 0 (white)
 		0xFF000000, // 1
 		0x00FF0000, // 2
@@ -73,7 +73,7 @@ static const uint32_t LUT_SBC[] = {
 };
 
 // Grayscale palette (4 bytes for each level of gray, 4 * 14 bytes total)
-static const uint8_t GrayPalette[] = {
+ const uint8_t GrayPalette[] = {
 		0x06,0x06,0x06,0x06, // level 1
 		0x0b,0x0b,0x0b,0x0b, // level 2
 		0x10,0x10,0x10,0x10, // level 3
