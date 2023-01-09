@@ -1,5 +1,6 @@
 // Include the library
 #include "ST7528i.h"
+#include "tables.h"
 
 // Foreground color
 uint8_t lcd_color = 15;
