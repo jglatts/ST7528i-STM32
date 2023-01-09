@@ -3,6 +3,7 @@
 
 
 #include "main.h"
+#include "tables.h"
 #include "stm32f1xx_hal.h"
 
 #define ST7528i_SLAVE_ADDR   	 (uint16_t)0x3F << 1 	// Slave address, shifted to the left
