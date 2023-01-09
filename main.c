@@ -91,17 +91,15 @@ static void Move_BikeMan(void) {
 static void Move_BikeMan_FullScreen(void) {
 	while (1) {
 		  for (int i = 0, start_y = 1; i < 10; i++, start_y+=25) {
-			  for (int j = 0, start_x = 1; j < 10; ++j, start_x+=5) {
+			  for (int j = 0, start_x = 1; j < 12; ++j, start_x+=5) {
 				  LCD_DrawBitmap(start_x, start_y, 30, 25, bike_man);
 				  ST7528i_Flush();
-				  HAL_Delay(50);
+				  HAL_Delay(1);
 				  ST7528i_Clear();
-				  ST7528i_Flush();
-				  HAL_Delay(10);
+				  HAL_Delay(1);
 			  }
 		  }
 		  ST7528i_Clear();
-		  ST7528i_Flush();
 	}
 }
 
