@@ -1,0 +1,196 @@
+/* USER CODE BEGIN Header */
+/**
+  ******************************************************************************
+  * @file           : main.c
+  * @brief          : Main program body
+  ******************************************************************************
+  * @attention
+  *
+  * Copyright (c) 2023 STMicroelectronics.
+  * All rights reserved.
+  *
+  * This software is licensed under terms that can be found in the LICENSE file
+  * in the root directory of this software component.
+  * If no LICENSE file comes with this software, it is provided AS-IS.
+  *
+  ******************************************************************************
+  */
+/* Includes */
+#include "main.h"
+#include "ST7528i.h"
+#include "fonts.h"
+#include "bit_maps.h"
+
+/* Private variables */
+I2C_HandleTypeDef hi2c1;
+
+/* Private function prototypes */
+static void MX_GPIO_Init(void);
+static void MX_I2C1_Init(void);
+static void Write_Text(const char*, int, int);
+static void Move_BikeMan(void);
+static void Move_BikeMan_FullScreen(void);
+
+/**
+  * @brief  The application entry point.
+  * @retval int
+  */
+int main(void) {
+  HAL_Init();
+
+  SystemClock_Config();
+  MX_GPIO_Init();
+  MX_I2C1_Init();
+
+  ST7528i_InitGPIO(&hi2c1);
+  ST7528i_Init();
+  HAL_Delay(5);
+
+
+  //Write_Text();
+  Move_BikeMan();
+  while (1) {
+	  // main loop is handled in Move_BikeMan()
+  }
+}
+
+/**
+  * @brief  Draw some text on the LCD.
+  * @retval None
+  */
+static void Write_Text(const char* str, int x, int y) {
+	LCD_PutStr(x, y, "Hello World!", fnt5x7);
+	ST7528i_Flush();
+}
+
+/**
+  * @brief  Draw the bikeman bitmap and 'move' it across the screen.
+  * @retval None
+  */
+static void Move_BikeMan(void) {
+  while (1) {
+	  int start_x = 1, start_y = 1;
+	  LCD_DrawBitmap(start_x, start_y, 30, 25, bike_man);
+	  ST7528i_Flush();
+	  HAL_Delay(50);
+	  for (uint8_t i = 0; i < 11; ++i) {
+		  ST7528i_Clear();
+		  start_x += 5;
+		  start_y += 7;
+		  LCD_DrawBitmap(start_x, start_y, 30, 25, bike_man);
+		  ST7528i_Flush();
+		  HAL_Delay(150);
+	  }
+	  ST7528i_Clear();
+  }
+}
+
+/**
+  * @brief  Draw the bikeman bitmap and 'move' it across the screen.
+  * 		The bikeman will move across the whole screen and go through all the rows
+  * @retval None
+  */
+static void Move_BikeMan_FullScreen(void) {
+	while (1) {
+		  for (int i = 0, start_y = 1; i < 10; i++, y+=25) {
+			  for (int j = 0, start_x = 1; j < 10; ++j, start_x+=5) {
+				  LCD_DrawBitmap(start_x, start_y, 30, 25, bike_man);
+				  ST7528i_Flush();
+				  HAL_Delay(50);
+				  ST7528i_Clear();
+				  ST7528i_Flush();
+				  HAL_Delay(10);
+			  }
+		  }
+		  ST7528i_Clear();
+		  ST7528i_Flush();
+	}
+}
+
+/**
+  * @brief System Clock Configuration
+  * @retval None
+  */
+void SystemClock_Config(void) {
+  RCC_OscInitTypeDef RCC_OscInitStruct = {0};
+  RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
+
+  /** Initializes the RCC Oscillators according to the specified parameters
+  * in the RCC_OscInitTypeDef structure.
+  */
+  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI;
+  RCC_OscInitStruct.HSIState = RCC_HSI_ON;
+  RCC_OscInitStruct.HSICalibrationValue = RCC_HSICALIBRATION_DEFAULT;
+  RCC_OscInitStruct.PLL.PLLState = RCC_PLL_NONE;
+  if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK) {
+    Error_Handler();
+  }
+
+  /** Initializes the CPU, AHB and APB buses clocks */
+  RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK|RCC_CLOCKTYPE_SYSCLK
+                              |RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2;
+  RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_HSI;
+  RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
+  RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV1;
+  RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
+
+  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_0) != HAL_OK) {
+    Error_Handler();
+  }
+}
+
+/**
+  * @brief I2C1 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_I2C1_Init(void) {
+  hi2c1.Instance = I2C1;
+  hi2c1.Init.ClockSpeed = 400000;
+  hi2c1.Init.DutyCycle = I2C_DUTYCYCLE_2;
+  hi2c1.Init.OwnAddress1 = 0;
+  hi2c1.Init.AddressingMode = I2C_ADDRESSINGMODE_7BIT;
+  hi2c1.Init.DualAddressMode = I2C_DUALADDRESS_DISABLE;
+  hi2c1.Init.OwnAddress2 = 0;
+  hi2c1.Init.GeneralCallMode = I2C_GENERALCALL_DISABLE;
+  hi2c1.Init.NoStretchMode = I2C_NOSTRETCH_DISABLE;
+  if (HAL_I2C_Init(&hi2c1) != HAL_OK) {
+    Error_Handler();
+  }
+
+}
+
+/**
+  * @brief GPIO Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_GPIO_Init(void) {
+  GPIO_InitTypeDef GPIO_InitStruct = {0};
+
+  /* GPIO Ports Clock Enable */
+  __HAL_RCC_GPIOC_CLK_ENABLE();
+  __HAL_RCC_GPIOD_CLK_ENABLE();
+  __HAL_RCC_GPIOA_CLK_ENABLE();
+  __HAL_RCC_GPIOB_CLK_ENABLE();
+
+  /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(GPIOC, LED_Pin, GPIO_PIN_RESET);
+
+  /*Configure GPIO pin : LED_Pin and RST_Pin */
+  GPIO_InitStruct.Pin = LED_Pin | RST_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
+
+}
+
+/**
+  * @brief  This function is executed in case of error occurrence.
+  * @retval None
+  */
+void Error_Handler(void) {
+  __disable_irq();
+  while (1);
+}
