@@ -46,8 +46,6 @@ int main(void) {
   ST7528i_Init();
   HAL_Delay(5);
 
-
-  //Write_Text();
   Move_BikeMan();
   while (1) {
 	  // main loop is handled in Move_BikeMan()
