@@ -24,10 +24,12 @@
 /* Private variables */
 I2C_HandleTypeDef hi2c1;
 
+int debug = 0;
+
 /* Private function prototypes */
 static void MX_GPIO_Init(void);
 static void MX_I2C1_Init(void);
-static void Write_Text(const char*, int, int);
+static void Write_Text();
 static void Move_BikeMan(void);
 static void Move_BikeMan_FullScreen(void);
 
@@ -44,20 +46,23 @@ int main(void) {
 
   ST7528i_InitGPIO(&hi2c1);
   ST7528i_Init();
-  HAL_Delay(5);
+  HAL_Delay(2);
 
   Move_BikeMan_FullScreen();
+  //Move_BikeMan();
+  //Write_Text();
   while (1) {
 	  // main loop is handled in Move_BikeMan()
   }
 }
 
+
 /**
   * @brief  Draw some text on the LCD.
   * @retval None
   */
-static void Write_Text(const char* str, int x, int y) {
-	LCD_PutStr(x, y, "Hello World!", fnt5x7);
+static void Write_Text() {
+	LCD_PutStr(10, 10, "Hello World!", fnt5x7);
 	ST7528i_Flush();
 }
 
@@ -90,16 +95,21 @@ static void Move_BikeMan(void) {
   */
 static void Move_BikeMan_FullScreen(void) {
 	while (1) {
-		  for (int i = 0, start_y = 1; i < 10; i++, start_y+=25) {
-			  for (int j = 0, start_x = 1; j < 12; ++j, start_x+=5) {
-				  LCD_DrawBitmap(start_x, start_y, 30, 25, bike_man);
-				  ST7528i_Flush();
-				  HAL_Delay(1);
-				  ST7528i_Clear();
-				  HAL_Delay(1);
-			  }
-		  }
-		  ST7528i_Clear();
+		// go through all the rows(y)
+		for (int i = 0, start_y = 1; i < 10; i++, start_y+=25) {
+			// move the bikeman across the columns(x)
+			for (int j = 0, start_x = 1; j < 12; ++j, start_x+=5) {
+				LCD_DrawBitmap(start_x, start_y, 30, 25, bike_man);
+				ST7528i_Flush();
+				HAL_Delay(5);
+				ST7528i_Clear();
+				HAL_Delay(5);
+				debug++;
+			}
+			debug++;
+		}
+		ST7528i_Clear();
+		debug = 0;
 	}
 }
 
