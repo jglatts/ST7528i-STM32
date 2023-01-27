@@ -50,7 +50,7 @@ void ST7528i_RST() {
 	ST7528i_RST_L();
 	HAL_Delay(1);
 	ST7528i_RST_H();
-	HAL_Delay(20);
+	HAL_Delay(2);
 }
 
 // Initialize SPI peripheral and ST7528i display
@@ -1083,8 +1083,8 @@ void LCD_DrawBitmap(uint8_t X, uint8_t Y, uint8_t W, uint8_t H, const uint8_t* p
 	uint8_t pY;
 	uint8_t tmpCh;
 	uint8_t bL;
-	uint8_t i = 0;
-	uint16_t size = W * H;
+	uint8_t size = sizeof(pBMP) / sizeof(pBMP[0]);
+	uint16_t i = 0;
 
 	pY = Y;
 	while (pY < Y + H) {
@@ -1092,10 +1092,14 @@ void LCD_DrawBitmap(uint8_t X, uint8_t Y, uint8_t W, uint8_t H, const uint8_t* p
 		while (pX < X + W) {
 			bL = 0;
 
+			// think we're hardfaulting here
+			tmpCh = *pBMP++;
+			/*
 			if (i < size)
 				tmpCh = pBMP[i++];
 			else
 				i = 0;
+			*/
 
 			if (tmpCh) {
 				while (bL < 8) {
