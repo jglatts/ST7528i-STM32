@@ -5,5 +5,6 @@ Based on work by https://github.com/muxall/ST7528i and https://github.com/Lonely
 
 ## Demo-code
 Please see main.c for a simple demo of the library.<br>
+SDA and SCL must be pulled up (10K resistors) to the 3.3v line<br>
 Detailed documentation to come soon!
 
