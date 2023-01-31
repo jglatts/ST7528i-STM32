@@ -1,4 +1,5 @@
 // Include the library
+#include <stdio.h>
 #include "ST7528i.h"
 #include "tables.h"
 
@@ -189,6 +190,7 @@ void I2Cx_SendBuff(uint8_t* ptr, uint32_t count) {
 	uint8_t cmd_arr[count + 1];
 	cmd_arr[0] = ST7528i_DATA_WRITE;
 	for (int i = 1; i < count + 1; ++i) {
+		//
 		cmd_arr[i] = ptr[count - i];
 	}
 	HAL_I2C_Master_Transmit(i2c_handle, ST7528i_SLAVE_ADDR, cmd_arr, count+1, 300);
@@ -1079,11 +1081,12 @@ uint8_t LCD_PutHex(uint8_t X, uint8_t Y, uint32_t num, const Font_TypeDef *Font)
 //   LSB top
 //   bottom bits truncated
 void LCD_DrawBitmap(uint8_t X, uint8_t Y, uint8_t W, uint8_t H, const uint8_t* pBMP) {
-	uint8_t pX;
-	uint8_t pY;
-	uint8_t tmpCh;
-	uint8_t bL;
-	uint8_t size = sizeof(pBMP) / sizeof(pBMP[0]);
+	uint8_t pX = 0;
+	uint8_t pY = 0;
+	uint8_t tmpCh = 0;
+	uint8_t bL = 0;
+	uint8_t mapPtr = pBMP;
+	size_t size = sizeof(pBMP);
 	uint16_t i = 0;
 
 	pY = Y;
@@ -1091,28 +1094,22 @@ void LCD_DrawBitmap(uint8_t X, uint8_t Y, uint8_t W, uint8_t H, const uint8_t* p
 		pX = X;
 		while (pX < X + W) {
 			bL = 0;
-
-			// think we're hardfaulting here
 			tmpCh = *pBMP++;
-			/*
-			if (i < size)
-				tmpCh = pBMP[i++];
-			else
-				i = 0;
-			*/
-
+			// draw the pixels
 			if (tmpCh) {
 				while (bL < 8) {
 					if (tmpCh & 0x01) LCD_Pixel(pX,pY + bL,lcd_color);
 					tmpCh >>= 1;
 					if (tmpCh) {
 						bL++;
-					} else {
+					}
+					else {
 						pX++;
 						break;
 					}
 				}
-			} else {
+			}
+			else {
 				pX++;
 			}
 		}

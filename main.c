@@ -24,8 +24,6 @@
 /* Private variables */
 I2C_HandleTypeDef hi2c1;
 
-int debug = 0;
-
 /* Private function prototypes */
 static void MX_GPIO_Init(void);
 static void MX_I2C1_Init(void);
@@ -96,7 +94,7 @@ static void Move_BikeMan(void) {
 static void Move_BikeMan_FullScreen(void) {
 	while (1) {
 		// go through all the rows(y)
-		for (int i = 0, start_y = 1; i < 10; i++, start_y+=25) {
+		for (int i = 0, start_y = 1; i < 7; i++, start_y+=25) {
 			// move the bikeman across the columns(x)
 			for (int j = 0, start_x = 1; j < 12; ++j, start_x+=5) {
 				LCD_DrawBitmap(start_x, start_y, 30, 25, bike_man);
@@ -104,12 +102,9 @@ static void Move_BikeMan_FullScreen(void) {
 				HAL_Delay(5);
 				ST7528i_Clear();
 				HAL_Delay(5);
-				debug++;
 			}
-			debug++;
 		}
 		ST7528i_Clear();
-		debug = 0;
 	}
 }
 
