@@ -14,7 +14,7 @@ uint16_t scr_height = SCR_H;
 I2C_HandleTypeDef* i2c_handle;
 
 // Display image orientation
-static uint8_t scr_orientation = SCR_ORIENT_CCW;
+static uint8_t scr_orientation = SCR_ORIENT_NORMAL;
 
 // Video RAM buffer for setting LCD data
 static uint8_t vRAM[(160 * 129) >> 1] __attribute__((aligned(4)));
@@ -180,18 +180,11 @@ void ST7528i_Flush(void) {
 
 // Replacement function for SPIx_SendBuf()
 void I2Cx_SendBuff(uint8_t* ptr, uint32_t count) {
-	/**
-	 * 	Issue is here!!!
-	 *
-	 * 	drawing is reversed, but its drawing !!!
-	 *
-	 */
 	// send the whole data buffer
 	uint8_t cmd_arr[count + 1];
 	cmd_arr[0] = ST7528i_DATA_WRITE;
-	for (int i = 1; i < count + 1; ++i) {
-		//
-		cmd_arr[i] = ptr[count - i];
+	for (int i = 1, j = 0; j < count; i++, j++) {
+		cmd_arr[i] = ptr[j];
 	}
 	HAL_I2C_Master_Transmit(i2c_handle, ST7528i_SLAVE_ADDR, cmd_arr, count+1, 300);
 }
