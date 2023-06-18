@@ -11,6 +11,9 @@
 #define ST7528i_CMD_CONT_WRITE	 (uint8_t)0x80 			//Co=1, A0=0 Low = control data
 #define ST7528i_DATA_WRITE     	 (uint8_t)0x40 			//C0=0, A0=1 High = display data
 #define ST7528i_MAX_PAGES 		 13
+#define ST7528i_DRAW_REG		 1
+#define ST7528i_DRAW_INVERTED    2
+
 
 #define ST7528i_RST_PORT      GPIOC
 #define ST7528i_RST_PIN       GPIO_PIN_14
@@ -222,7 +225,7 @@ void ST7528i_SetScrollLine(uint8_t line);
 void ST7528i_Orientation(uint8_t orientation);
 
 // Replacement for SPIx_SendBuf();
-void I2Cx_SendBuff(uint8_t* ptr, uint32_t count);
+void I2Cx_SendBuff(uint8_t* ptr, uint32_t count, uint8_t draw_type);
 
 void LCD_Pixel(uint8_t X, uint8_t Y, uint8_t GS);
 void LCD_HLine(uint8_t X1, uint8_t X2, uint8_t Y, uint8_t GS);
