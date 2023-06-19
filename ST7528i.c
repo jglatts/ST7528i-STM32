@@ -172,7 +172,7 @@ void ST7528i_Flush(void) {
 		ST7528i_cmd(page);
 		ST7528i_cmd(ST7528i_COLM_MSB);
 		ST7528i_cmd(ST7528i_COLM_LSB);
-		I2Cx_SendBuff(ptr, SCR_PAGE_WIDTH * 4, ST7528i_DRAW_REG);
+		I2Cx_SendBuff(ptr, SCR_PAGE_WIDTH * 4, ST7528i_DRAW_INVERTED);
 		ptr += SCR_PAGE_WIDTH * 4;
 		page++;
 	}
@@ -183,8 +183,8 @@ void I2Cx_SendBuff(uint8_t* ptr, uint32_t count, uint8_t draw_type) {
 	// send the whole data buffer
 	uint8_t cmd_arr[count + 1];
 	cmd_arr[0] = ST7528i_DATA_WRITE;
-	for (int i = 1, j = 0; i < count; i++, j++) {
-		cmd_arr[i] = ptr[(draw_type == ST7528i_DRAW_INVERTED) ? count - i : j];
+	for (int i = 1, j = 0; j < count; i++, j++) {
+		cmd_arr[i] = ptr[(draw_type == ST7528i_DRAW_REG) ? j : count - i];
 	}
 	HAL_I2C_Master_Transmit(i2c_handle, ST7528i_SLAVE_ADDR, cmd_arr, count+1, 300);
 }
@@ -239,7 +239,7 @@ void ST7528i_Contrast(uint8_t res_ratio, uint8_t lcd_bias, uint8_t el_vol) {
 	buf[3] = el_vol & 0x3f;
 
 	// Transmit sequence to display
-	I2Cx_SendBuff(buf, sizeof(buf), ST7528i_DRAW_REG);
+	I2Cx_SendBuff(buf, sizeof(buf), ST7528i_DRAW_INVERTED);
 }
 
 // Set all LCD pixels on or off
