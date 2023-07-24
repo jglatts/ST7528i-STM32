@@ -1,9 +1,26 @@
+/*
+ * ST7528i.h
+ *
+ *  Created on: Jul 13, 2023
+ *      Author: John
+ */
+
+#ifndef INC_ST7528I_H_
+#define INC_ST7528I_H_
+
 #ifndef __ST7528i_H
 #define __ST7528i_H
 
 
 #include "main.h"
+// add and #ifdef and check for stm32f1 vs stm32f4 include needs
+STM32F4
+#if defined(ST7528i_STM32F4)
+#include "stm32f4xx_hal.h"
+#elif defined(ST7528i_STM32F1)
 #include "stm32f1xx_hal.h"
+#endif
+
 
 #define ST7528i_SLAVE_ADDR   	 (uint16_t)0x3F << 1 	// Slave address, shifted to the left
 #define ST7528i_CMD_MODE      	 (uint8_t)0x38 			// Mode set (double byte command)
@@ -14,9 +31,8 @@
 #define ST7528i_DRAW_REG		 1
 #define ST7528i_DRAW_INVERTED    2
 
-
-#define ST7528i_RST_PORT      GPIOC
-#define ST7528i_RST_PIN       GPIO_PIN_14
+#define ST7528i_RST_PORT      RST_GPIO_Port
+#define ST7528i_RST_PIN       RST_Pin
 #define ST7528i_RST_H()       HAL_GPIO_WritePin(ST7528i_RST_PORT,ST7528i_RST_PIN, GPIO_PIN_SET)
 #define ST7528i_RST_L()       HAL_GPIO_WritePin(ST7528i_RST_PORT,ST7528i_RST_PIN, GPIO_PIN_RESET)
 
@@ -81,12 +97,15 @@
 #define ST7528i_MODE_BE2      (uint8_t)0x04 // Booster efficiency level 2
 
 // Screen dimensions
+// need to fix here
 #define SCR_W                (uint8_t)160 // width
 #define SCR_H                (uint8_t)100 // height
 
 // Screen page width
-#define SCR_PAGE_WIDTH       (uint32_t)128 // In pixels
-
+// issue here
+// seeting SCR_PAGE_WIDTH to 160 will throw-off the position
+// setting to 128 will draw correctly but leave pixels with UB
+#define SCR_PAGE_WIDTH       (uint32_t)160 // In pixels
 
 // Frame frequency enumeration
 enum {
@@ -202,7 +221,6 @@ extern uint8_t lcd_color;
 extern uint16_t scr_width;
 extern uint16_t scr_height;
 
-extern I2C_HandleTypeDef* i2c_handle;
 
 // Function prototypes
 void ST7528i_InitGPIO(I2C_HandleTypeDef*);
@@ -251,3 +269,5 @@ void LCD_DrawBitmapGS(uint8_t X, uint8_t Y, uint8_t W, uint8_t H, const uint8_t*
 void LCD_Invert(uint8_t X, uint8_t Y, uint8_t W, uint8_t H);
 
 #endif // __ST7528i_H
+
+#endif /* INC_ST7528I_H_ */
