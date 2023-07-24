@@ -1,4 +1,3 @@
-// Include the library
 #include <stdio.h>
 #include "ST7528i.h"
 #include "tables.h"
@@ -10,14 +9,14 @@ uint8_t lcd_color = 15;
 uint16_t scr_width  = SCR_W;
 uint16_t scr_height = SCR_H;
 
-// Handle for I2C
 I2C_HandleTypeDef* i2c_handle;
 
 // Display image orientation
-static uint8_t scr_orientation = SCR_ORIENT_CCW;
+static uint8_t scr_orientation = SCR_ORIENT_NORMAL;
 
 // Video RAM buffer for setting LCD data
-static uint8_t vRAM[(SCR_W * SCR_H) >> 1] __attribute__((aligned(4)));
+static uint8_t vRAM[(160 * 128) >> 1] __attribute__((aligned(4)));
+//static uint8_t vRAM[(SCR_W * SCR_H) >> 1] __attribute__((aligned(4)));
 
 // Send single byte command to display
 // input:
@@ -172,7 +171,7 @@ void ST7528i_Flush(void) {
 		ST7528i_cmd(page);
 		ST7528i_cmd(ST7528i_COLM_MSB);
 		ST7528i_cmd(ST7528i_COLM_LSB);
-		I2Cx_SendBuff(ptr, SCR_PAGE_WIDTH * 4, ST7528i_DRAW_INVERTED);
+		I2Cx_SendBuff(ptr, SCR_PAGE_WIDTH * 4, ST7528i_DRAW_REG);
 		ptr += SCR_PAGE_WIDTH * 4;
 		page++;
 	}
@@ -208,7 +207,7 @@ void ST7528i_ClearScreen(void) {
 	  for(i=0;i<13;i++){      //100 pixels = 12.5 pages to
 		//Serial.print("ComSend Start: Sending page: ");
 		//Serial.println(page,HEX);
-		ST7528i_cmd(page);
+		ST7528i_cmd(ST7528i_FIRST_PAGE);
 		ST7528i_cmd(0x10);      //column address Y9:Y6 0x1x is set colum address MSB 0x10 is first column MSB addr. pg29
 		ST7528i_cmd(0x00);      //column address Y5:Y2 0x0x is set column addr LSB; 0x01 is first column lsb addr??
 		for(n=0;n<160;n++){     // up to 160
@@ -387,10 +386,12 @@ void LCD_Pixel(uint8_t X, uint8_t Y, uint8_t GS) {
 	// X and Y coordinate values must be swapped if screen rotated either clockwise or counter-clockwise
 	if (scr_orientation & (SCR_ORIENT_CW | SCR_ORIENT_CCW)) {
 		voffs = X & 0x07;
-		ptr = (uint32_t *)&vRAM[((X >> 3) << 9) + (Y << 2)];
+		uint32_t vIdx = ((X / 8) * (SCR_PAGE_WIDTH * 4)) + (Y * 4);
+		ptr = (uint32_t *)&vRAM[vIdx];
 	} else {
 		voffs = Y & 0x07;
-		ptr = (uint32_t *)&vRAM[((Y >> 3) << 9) + (X << 2)];
+		uint32_t vIdx = ((Y / 8) * (SCR_PAGE_WIDTH * 4)) + (X * 4);
+		ptr = (uint32_t *)&vRAM[vIdx];
 	}
 
 	// Vertical shift of the pixel bitmap
